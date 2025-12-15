@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Manage Goats — GOAT</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  body{
+    font-family:Montserrat,sans-serif;
+    background:#f4f4f4;
+    margin:0;
+  }
+
+  header{
+    background:#6f4e37;
+    color:#fff;
+    padding:16px;
+  }
+
+  .top-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    max-width:1200px;
+    margin:0 auto;
+    flex-wrap:wrap;
+  }
+
+  .logo{
+    font-size:2rem;
+    font-weight:700;
+  }
+
+  nav ul{
+    display:flex;
+    gap:16px;
+    list-style:none;
+    margin:0;
+    padding:0;
+    flex-wrap:wrap;
+  }
+
+  nav a{
+    color:#fff;
+    text-decoration:none;
+    font-weight:600;
+    padding:6px 10px;
+    border-radius:4px;
+  }
+
+  nav a:hover{
+    background:rgba(255,255,255,.2);
+  }
+
+  main{
+    max-width:1000px;
+    margin:40px auto;
+    padding:0 16px;
+  }
+
+  h1{
+    text-align:center;
+    color:#6f4e37;
+    margin-bottom:24px;
+  }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    background:#fff;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 4px 12px rgba(0,0,0,.1);
+  }
+
+  th,td{
+    padding:12px;
+    text-align:center;
+    border-bottom:1px solid #eee;
+    word-wrap: break-word;
+  }
+
+  th{
+    background:#6f4e37;
+    color:#fff;
+  }
+
+  td img{
+    width:80px;
+    height:80px;
+    object-fit:cover;
+    border-radius:8px;
+  }
+
+  button{
+    padding:6px 12px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:600;
+  }
+
+  .view-btn{
+    background:#6f4e37;
+    color:#fff;
+    margin-right:6px;
+  }
+
+  .delete-btn{
+    background:#e74c3c;
+    color:#fff;
+  }
+
+  /* View modal */
+  .modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.5);
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+  }
+
+  .modal-content{
+    background:#fff;
+    padding:24px;
+    border-radius:12px;
+    max-width:400px;
+    width:90%;
+    text-align:center;
+    position:relative;
+  }
+
+  .modal-close{
+    position:absolute;
+    top:10px;
+    right:14px;
+    font-size:20px;
+    font-weight:bold;
+    cursor:pointer;
+  }
+
+  /* Confirm delete modal */
+  .confirm-box{
+    background:#fff;
+    padding:22px;
+    border-radius:12px;
+    max-width:360px;
+    width:90%;
+    text-align:center;
+  }
+
+  .confirm-actions{
+    display:flex;
+    gap:12px;
+    margin-top:16px;
+    flex-wrap:wrap;
+  }
+
+  .btn-cancel{
+    flex:1;
+    background:#ccc;
+  }
+
+  .btn-confirm{
+    flex:1;
+    background:#e74c3c;
+    color:#fff;
+  }
+
+  /* Responsive Styles */
+  @media (max-width: 1024px) {
+    .top-row {
+      justify-content: center;
+    }
+
+    nav ul {
+      justify-content: center;
+      gap:12px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .top-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .logo{
+      font-size:1.5rem;
+    }
+
+    table th, table td{
+      padding:8px;
+      font-size:0.9rem;
+    }
+
+    td img{
+      width:60px;
+      height:60px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    nav ul{
+      flex-direction: column;
+      width:100%;
+      gap:8px;
+    }
+
+    table{
+      font-size:0.85rem;
+    }
+
+    table th, table td{
+      padding:6px;
+    }
+
+    td img{
+      width:50px;
+      height:50px;
+    }
+
+    .view-btn, .delete-btn{
+      padding:4px 8px;
+      font-size:0.85rem;
+    }
+  }
+
+  @media (max-width: 360px) {
+    h1{
+      font-size:1.5rem;
+    }
+
+    table th, table td{
+      font-size:0.8rem;
+      padding:4px;
+    }
+
+    td img{
+      width:40px;
+      height:40px;
+    }
+  }
+</style>
+
+</head>
+
+<body>
+
+<header>
+  <div class="top-row">
+    <div class="logo">Bagaloyos Goat Farm</div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="add.html">Add Goat</a></li>
+        <li><a href="bred.html">Breed Goats</a></li>
+        <li><a href="medic.html">Medicine</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <h1>Manage Your Goats</h1>
+
+  <table id="goatTable">
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>ID</th>
+        <th>Sex</th>
+        <th>Age</th>
+        <th>Breed</th>
+        <th>Origin</th>
+        <th>Added At</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</main>
+
+<!-- View modal -->
+<div class="modal" id="viewModal">
+  <div class="modal-content">
+    <span class="modal-close" id="viewClose">&times;</span>
+    <div id="viewBody"></div>
+  </div>
+</div>
+
+<!-- Delete confirm modal -->
+<div class="modal" id="deleteModal">
+  <div class="confirm-box">
+    <h3>Confirm Deletion</h3>
+    <p id="deleteText"></p>
+    <div class="confirm-actions">
+      <button class="btn-cancel" id="cancelDelete">Cancel</button>
+      <button class="btn-confirm" id="confirmDelete">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const tableBody = document.querySelector('#goatTable tbody');
+
+  const viewModal = document.getElementById('viewModal');
+  const viewBody = document.getElementById('viewBody');
+  const viewClose = document.getElementById('viewClose');
+
+  const deleteModal = document.getElementById('deleteModal');
+  const deleteText = document.getElementById('deleteText');
+  const confirmDelete = document.getElementById('confirmDelete');
+  const cancelDelete = document.getElementById('cancelDelete');
+
+  let deleteIndex = null;
+
+  function getGoats(){
+    return JSON.parse(localStorage.getItem('goats') || '[]');
+  }
+
+  function saveGoats(goats){
+    localStorage.setItem('goats', JSON.stringify(goats));
+  }
+
+  function renderGoats(){
+    const goats = getGoats();
+    tableBody.innerHTML = '';
+
+    goats.forEach((g, index) => {
+      const tr = document.createElement('tr');
+
+      tr.innerHTML = `
+        <td><img src="${g.img || 'sheep.jpg'}"></td>
+        <td>${g.id}</td>
+        <td>${g.sex}</td>
+        <td>${g.age.years}y ${g.age.months}m</td>
+        <td>${g.breed}</td>
+        <td>${g.local}</td>
+        <td>${g.addedAt}</td>
+        <td>
+          <button class="view-btn">View</button>
+          <button class="delete-btn">Delete</button>
+        </td>
+      `;
+
+      tr.querySelector('.view-btn').onclick = () => {
+        viewBody.innerHTML = `
+          <h3>Goat ID: ${g.id}</h3>
+          <img src="${g.img || 'sheep.jpg'}" style="width:100%;border-radius:8px;margin-bottom:10px;">
+          <p><strong>Sex:</strong> ${g.sex}</p>
+          <p><strong>Age:</strong> ${g.age.years} years, ${g.age.months} months</p>
+          <p><strong>Breed:</strong> ${g.breed}</p>
+          <p><strong>Local:</strong> ${g.local}</p>
+          <p><strong>Added At:</strong> ${g.addedAt}</p>
+        `;
+        viewModal.style.display = 'flex';
+      };
+
+      tr.querySelector('.delete-btn').onclick = () => {
+        deleteIndex = index;
+        deleteText.textContent = `Delete goat ID "${g.id}"? This cannot be undone.`;
+        deleteModal.style.display = 'flex';
+      };
+
+      tableBody.appendChild(tr);
+    });
+  }
+
+  confirmDelete.onclick = () => {
+    if(deleteIndex !== null){
+      const goats = getGoats();
+      goats.splice(deleteIndex, 1);
+      saveGoats(goats);
+      deleteIndex = null;
+      deleteModal.style.display = 'none';
+      renderGoats();
+    }
+  };
+
+  cancelDelete.onclick = () => {
+    deleteIndex = null;
+    deleteModal.style.display = 'none';
+  };
+
+  viewClose.onclick = () => viewModal.style.display = 'none';
+
+  window.onclick = e => {
+    if(e.target === viewModal) viewModal.style.display = 'none';
+    if(e.target === deleteModal){
+      deleteIndex = null;
+      deleteModal.style.display = 'none';
+    }
+  };
+
+  renderGoats();
+</script>
+
+</body>
+</html>

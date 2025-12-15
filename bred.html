@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bred Goats — SHEEP</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Reset & base */
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Montserrat,sans-serif;background:#f4f4f4;line-height:1.5;color:#333;}
+header{background:#6f4e37;color:#fff;padding:16px;}
+.top-row{display:flex;justify-content:space-between;align-items:center;max-width:1200px;margin:0 auto;flex-wrap:wrap;}
+.logo{font-size:2rem;font-family:'Playfair Display',serif;}
+nav ul{display:flex;gap:16px;list-style:none;flex-wrap:wrap;margin-top:8px;}
+nav a{text-decoration:none;color:#fff;font-weight:600;padding:6px 12px;border-radius:6px;transition:background 0.3s;}
+nav a:hover{background:rgba(255,255,255,0.2);}
+
+/* Main */
+main{max-width:1200px;margin:80px auto 40px;padding:0 16px;display:flex;flex-direction:column;gap:40px;}
+h1,h2{text-align:center;color:#6f4e37;margin-bottom:16px;}
+h1{font-size:2rem;}
+h2{font-size:1.5rem;margin-top:0;}
+
+/* Form */
+form{background:#fff;padding:24px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;}
+form select,input[type="date"]{flex:1 1 45%;padding:12px;border-radius:8px;border:1px solid #ccc;font-size:1rem;}
+form button{flex:1 1 100%;padding:12px;background:#6f4e37;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;transition:0.3s;}
+form button:hover{background:#593c2b;}
+
+/* Table */
+.table-container{overflow-x:auto;background:#fff;padding:16px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+table{width:100%;border-collapse:collapse;min-width:700px;}
+th,td{text-align:center;padding:12px;border-bottom:1px solid #eee;vertical-align:middle;}
+th{background:#6f4e37;color:#fff;border-radius:8px 8px 0 0;}
+.goat-info{display:flex;align-items:center;gap:8px;}
+.goat-info img{width:50px;height:50px;object-fit:cover;border-radius:8px;}
+.delete-btn{background:#e74c3c;color:#fff;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;transition:0.3s;}
+.delete-btn:hover{background:#c0392b;}
+
+/* Responsive */
+@media(max-width:768px){
+  form select,input[type="date"]{flex:1 1 100%;}
+  .goat-info img{width:40px;height:40px;}
+  table{min-width:100%;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="top-row">
+    <div class="logo">Bagaloyos Goat Farm</div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="manage.html">Manage Goats</a></li>
+        <li><a href="add.html">Add Goat</a></li>
+        <li><a href="medic.html">Medicine</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+<h1>Breeding Section</h1>
+
+<!-- Breed Goats Form -->
+<h2>Breed Goats</h2>
+<form id="breed-form">
+  <select id="male-goat" required>
+    <option value="">Select Male Goat</option>
+  </select>
+  <select id="female-goat" required>
+    <option value="">Select Female Goat</option>
+  </select>
+  <input type="date" id="breed-date" required>
+  <button type="submit">Record Breeding</button>
+</form>
+
+<!-- Breeding History -->
+<h2>Breeding History</h2>
+<div class="table-container">
+  <table id="history-table">
+    <thead>
+      <tr>
+        <th>Male Goat</th>
+        <th>Female Goat</th>
+        <th>Date</th>
+        <th>Attempt</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+</main>
+
+<script>
+const maleSelect = document.getElementById('male-goat');
+const femaleSelect = document.getElementById('female-goat');
+const breedForm = document.getElementById('breed-form');
+const historyTable = document.querySelector('#history-table tbody');
+
+// Load goats and breeding history
+function loadGoats() { return JSON.parse(localStorage.getItem('goats')||'[]'); }
+function loadHistory() { return JSON.parse(localStorage.getItem('breedingHistory')||'[]'); }
+
+// Populate goat selects
+function populateGoatDropdowns() {
+  const goats = loadGoats();
+  maleSelect.innerHTML = '<option value="">Select Male Goat</option>';
+  femaleSelect.innerHTML = '<option value="">Select Female Goat</option>';
+  goats.filter(g=>g.sex==='Male').forEach(g=>maleSelect.innerHTML+=`<option value="${g.id}">${g.id} - ${g.breed}</option>`);
+  goats.filter(g=>g.sex==='Female').forEach(g=>femaleSelect.innerHTML+=`<option value="${g.id}">${g.id} - ${g.breed}</option>`);
+}
+
+// Render breeding history with images
+function renderHistory() {
+  const history = loadHistory();
+  const goats = loadGoats();
+  historyTable.innerHTML='';
+  history.forEach((h,index)=>{
+    const maleGoat = goats.find(g=>g.id===h.male);
+    const femaleGoat = goats.find(g=>g.id===h.female);
+
+    const tr = document.createElement('tr');
+    tr.innerHTML=`
+      <td>
+        <div class="goat-info">
+          <img src="${maleGoat?.img||'sheep.jpg'}" alt="${h.male}">
+          <span>${h.male} (${maleGoat?.breed||''})</span>
+        </div>
+      </td>
+      <td>
+        <div class="goat-info">
+          <img src="${femaleGoat?.img||'sheep.jpg'}" alt="${h.female}">
+          <span>${h.female} (${femaleGoat?.breed||''})</span>
+        </div>
+      </td>
+      <td>${h.date}</td>
+      <td>${h.attempt}</td>
+      <td><button class="delete-btn" data-index="${index}">Delete</button></td>
+    `;
+    historyTable.appendChild(tr);
+  });
+
+  // Delete button
+  document.querySelectorAll('#history-table .delete-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      let history = loadHistory();
+      history.splice(btn.dataset.index,1);
+      localStorage.setItem('breedingHistory',JSON.stringify(history));
+      renderHistory();
+    });
+  });
+}
+
+// Add breeding record
+breedForm.addEventListener('submit',e=>{
+  e.preventDefault();
+  const male = maleSelect.value;
+  const female = femaleSelect.value;
+  const date = document.getElementById('breed-date').value;
+  if(!male || !female || !date) return;
+
+  let history = loadHistory();
+
+  // Count previous attempts for this pair
+  const previousAttempts = history.filter(h=>h.male===male && h.female===female).length + 1;
+
+  history.push({male,female,date,attempt:previousAttempts});
+  localStorage.setItem('breedingHistory',JSON.stringify(history));
+
+  breedForm.reset();
+  renderHistory();
+  alert(`Breeding recorded! Attempt #${previousAttempts}`);
+});
+
+// Initial setup
+populateGoatDropdowns();
+renderHistory();
+</script>
+
+</body>
+</html>
